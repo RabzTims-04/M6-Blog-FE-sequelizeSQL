@@ -48,8 +48,8 @@ const {REACT_APP_BACKEND_URL} = process.env
 
   editBlog = async (e)=>{
     e.preventDefault()
-/*     let formData = new FormData()
-    formData.append('cover', this.state.blog.image) */
+    let formData = new FormData()
+    formData.append('cover', this.state.blog.image)
 
     try {
       const authorId = this.props.authors.find(author => author.name.includes(this.state.blog.authorId.split(' ')[0])).id
@@ -67,7 +67,22 @@ const {REACT_APP_BACKEND_URL} = process.env
         }
       })
       const data = await response.json()
+      const blogId= await data.id
       if(response.ok){
+        if(this.state.blog.image){
+          try {
+            const postCover = await fetch(`${this.url}/${blogId}/cover`,{
+              method:'POST',
+              body: formData
+            })
+            if(postCover.ok){
+              const coverdata = await postCover.json()
+              console.log(coverdata);
+            }
+          } catch (error) {
+            console.log(error);
+          }
+        }
         this.props.edited(data)
         alert('blog post is successfully edited')
         this.setState({
@@ -103,7 +118,7 @@ const {REACT_APP_BACKEND_URL} = process.env
             placeholder="Title" />
           </Form.Group>
 
-         {/*  <label className="p-0 d-flex mt-2" for="image">                                     
+           <label className="p-0 d-flex mt-2" for="image">                                     
             <input 
               onClick={(e)=> {e.stopPropagation()
                       return true}}  
@@ -113,6 +128,7 @@ const {REACT_APP_BACKEND_URL} = process.env
               ref={this.ref}
               id="image"
               onChange={(e) => {this.setState({
+                        ...this.state,
                         blog:{...this.state.blog, 
                         image: e.target.files[0]}
                       })
@@ -125,9 +141,9 @@ const {REACT_APP_BACKEND_URL} = process.env
             className="mt-3"
           >
             Upload Cover
-          </Button>  */}   
+          </Button>   
 
-           <Form.Group  className="mt-3">
+{/*            <Form.Group  className="mt-3">
             <Form.Label>Cover Image</Form.Label>
             <Form.Control
             required 
@@ -142,55 +158,7 @@ const {REACT_APP_BACKEND_URL} = process.env
             })}
             size="lg" 
             placeholder="Link" />
-          </Form.Group>
-
-       {/*  <div className="d-flex flex-row">
-        <div>
-          <Form.Group  className="mt-3">
-            <Form.Label>Read Time</Form.Label>
-            <Form.Control 
-            type="number"
-            id="value"
-            required
-            value={this.state.blog.readTime.value}
-            onChange={(e)=> this.setState({
-              blog:{
-                ...this.state.blog,
-                readTime:{
-                  ...this.state.blog.readTime,
-                  value: e.target.value
-                }                   
-              }
-            })}
-            size="lg" 
-             />
-          </Form.Group>
-         </div>
-         <div>
-         <Form.Group className="mt-3">
-            <Form.Label>Unit</Form.Label>
-            <Form.Control 
-            id="unit"
-            required
-            value={this.state.blog.readTime.unit}
-            onChange={(e)=> this.setState({
-              blog:{
-                ...this.state.blog,
-                readTime:{
-                  ...this.state.blog.readTime,
-                  unit: e.target.value
-                }                   
-              }
-            })}
-            size="lg" 
-            as="select">
-              <option>hours</option>
-              <option>minutes</option>
-              <option>seconds</option>
-            </Form.Control>
-          </Form.Group>
-         </div>
-        </div> */}
+          </Form.Group> */}
 
           <Form.Group controlId="blog-category" className="mt-3">
             <Form.Label>Category</Form.Label>

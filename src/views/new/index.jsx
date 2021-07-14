@@ -1,13 +1,14 @@
 import React, { Component } from "react";
+import { createRef } from "react";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { Container, Form, Button } from "react-bootstrap";
-import striptags from "striptags";
 import "./styles.css";
-import { Link } from "react-router-dom";
 
 const {REACT_APP_BACKEND_URL} = process.env
 export default class NewBlogPost extends Component {
+
+  ref = createRef()
 
   state={
     authors:[],
@@ -16,7 +17,7 @@ export default class NewBlogPost extends Component {
     blog:{
 	    "category": "",
 	    "title": "",
-	    "cover":"",
+	    "cover":"https://avatarfiles.alphacoders.com/896/thumb-89615.png",
       "content":"",
 	    "authorId":[]
     }
@@ -49,6 +50,8 @@ export default class NewBlogPost extends Component {
 
   addBlog = async (e) =>{
     e.preventDefault()
+    let formData = new FormData()
+    formData.append('cover', this.state.blog.image)
     try {
       const authorId = this.state.authors.find(author => author.name.includes(this.state.blog.authorId.split(' ')[0])).id
       const response = await fetch(this.url,{
@@ -65,7 +68,22 @@ export default class NewBlogPost extends Component {
         })
       })
       const data = await response.json()
+      const blogId = await data.id
       if(response.ok){
+        if(this.state.blog.image){
+          try {
+            const postCover = await fetch(`${this.url}/${blogId}/cover`,{
+              method:'POST',
+              body: formData
+            })
+            if(postCover.ok){
+              const coverData = await postCover.json()
+              console.log(coverData);
+            }
+          } catch (error) {
+            console.log(error);
+          }
+        }
         alert('Data successfully posted :)')
         this.setState({
           blog:{
@@ -106,22 +124,30 @@ export default class NewBlogPost extends Component {
             placeholder="Title" />
           </Form.Group>
 
-          <Form.Group  className="mt-3">
-            <Form.Label>Cover Image</Form.Label>
-            <Form.Control 
-            type="text"
-            id="cover"
-            required
-            value={this.state.blog.cover}
-            onChange={(e)=> this.setState({
-              blog:{
-                ...this.state.blog,
-                cover: e.target.value                  
-              }
-            })}
-            size="lg" 
-            placeholder="Link" />
-          </Form.Group>
+          <label className="p-0 d-flex mt-2" for="image">                                     
+            <input 
+              onClick={(e)=> {e.stopPropagation()
+                      return true}}  
+              hidden
+              type="file"
+              id="image"
+              ref={this.ref}
+              id="image"
+              onChange={(e) => {this.setState({
+                      ...this.state,
+                        blog:{...this.state.blog, 
+                        image: e.target.files[0]}
+                      })
+                      console.log(e.target.files[0])}}
+            />
+          </label> 
+          <Button
+            onClick={()=> this.ref.current.click()}
+            variant="dark"
+            className="mt-3"
+          >
+            Upload Cover
+          </Button>
 
           <Form.Group controlId="blog-category" className="mt-3">
             <Form.Label>Category</Form.Label>
@@ -170,45 +196,6 @@ export default class NewBlogPost extends Component {
               )}
             </Form.Control>
           </Form.Group>
-
-          {/* <Form.Group controlId="blog-form" className="mt-3">
-            <Form.Label>Author Name</Form.Label>
-            <Form.Control 
-            id="name"
-            required
-            value={this.state.blog.author.name}
-            onChange={(e)=> this.setState({
-              blog:{
-                ...this.state.blog,
-                author:{
-                  ...this.state.blog.author,
-                  name: e.target.value
-                }                   
-              }
-            })}
-            size="lg" 
-            placeholder="Name" />
-          </Form.Group>
-
-          <Form.Group  className="mt-3">
-            <Form.Label>Author's Image</Form.Label>
-            <Form.Control 
-            type="text"
-            id="avatar"
-            required
-            value={this.state.blog.author.avatar}
-            onChange={(e)=> this.setState({
-              blog:{
-                ...this.state.blog,
-                author:{
-                  ...this.state.blog.author,
-                  avatar: e.target.value
-                }                   
-              }
-            })}
-            size="lg" 
-            placeholder="Link" />
-          </Form.Group> */}
 
           <Form.Group className="mt-3">
             <Form.Label>Blog Content</Form.Label>
