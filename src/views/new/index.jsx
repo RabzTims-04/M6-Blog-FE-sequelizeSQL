@@ -132,7 +132,6 @@ export default class NewBlogPost extends Component {
               type="file"
               id="image"
               ref={this.ref}
-              id="image"
               onChange={(e) => {this.setState({
                       ...this.state,
                         blog:{...this.state.blog, 

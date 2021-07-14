@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { createRef } from "react";
 import { Container, Row, Col, Form, Button, InputGroup, FormControl } from 'react-bootstrap';
 import "./styles.css"
 
@@ -6,12 +7,14 @@ const { REACT_APP_BACKEND_URL } = process.env
 
 class AuthorRegister extends Component {
 
+    ref = createRef()
+
     state={
         authors:{
             name:'',
             surname:"",
             email:"",
-            avatar:"https://i.pinimg.com/originals/03/4b/de/034bde783ea726b922100c86547831e8.jpg"
+            avatar:""
         }
     }
 
@@ -28,6 +31,8 @@ class AuthorRegister extends Component {
     url = `${REACT_APP_BACKEND_URL}/authors`
 
     addAuthor = async(e) => {
+        let formData = new FormData()
+        formData.append('avatar', this.state.authors.image)
         try {
             const response = await fetch(this.url,{
                 method:'POST',
@@ -37,7 +42,22 @@ class AuthorRegister extends Component {
                 }
             })
             const data = await response.json()
+            const authorId = await data.id
             if (response.ok) {
+                if(this.state.authors.image){
+                    try {
+                        const avatarPost = await fetch (`${this.url}/${authorId}/profile`,{
+                            method:'POST',
+                            body:formData
+                        })
+                        if(avatarPost.ok){
+                            const dataPost = await avatarPost.json()
+                            console.log(dataPost);
+                        }
+                    } catch (error) {
+                        console.log(error);
+                    }
+                }
                 alert("author details posted successfully")
                 this.setState({
                     authors:{
@@ -61,9 +81,27 @@ class AuthorRegister extends Component {
                 <Row  className="mt-5">
                     <Col md={{span: 4, offset: 4}}>
                     <div className="d-flex justify-content-between mb-5">
-                        <img
+                            <input
+                                style={{display:'none'}} 
+                                onClick={(e)=> {e.stopPropagation()
+                                return true}}
+                                title="choose"
+                                type="file"
+                                id="image"
+                                ref={this.ref}
+                                onChange={(e) => {this.setState({
+                                    authors:{...this.state.authors, 
+                                        image: e.target.files[0]}
+                                })
+                                console.log(e.target.files[0]);}}
+                            />
+                            <label for='image'>
+                            
+                            </label>
+                            <img
+                            onClick={()=> this.ref.current.click()}
                             className="avatar" 
-                            src="https://i.pinimg.com/originals/03/4b/de/034bde783ea726b922100c86547831e8.jpg" 
+                            src="https://i.pinimg.com/originals/03/4b/de/034bde783ea726b922100c86547831e8.jpg"
                             alt="avatar"
                             />
                         <h4 className="text-center pt-3 mt-2">Author Details</h4>
