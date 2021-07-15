@@ -32,6 +32,7 @@ class Blog extends Component {
     
      const blogId = this.id
      const blog = this.props.blogs.find(blog => blog.id.toString() === blogId)
+     console.log(blog);
      if(this.props.edited){
        this.setState({
          ...this.state,
@@ -301,11 +302,11 @@ class Blog extends Component {
                         <hr/>
 
                         <div className="mt-5">
-                          <h6>{this.state.comments.length} {this.state.comments.length === 1?'Comment':'Comments'}</h6>
-                          {this.state.comments.length ? this.state.comments.map( comment =>
-                              <div key={comment._id} className="mb-3">                      
+                          <h6>{this.state.blog.comments.length} {this.state.blog.comments.length === 1?'Comment':'Comments'}</h6>
+                          {this.state.blog.comments.length ? this.state.blog.comments.map( comment =>
+                              <div key={comment.commentId} className="mb-3">                      
                                 <Card>
-                                  {this.state.editMode === comment._id
+                                  {this.state.editMode === comment.commentId
 
                                   ?<>
                                   <Card.Header>
@@ -329,7 +330,7 @@ class Blog extends Component {
                                       </Form.Group>
                                     </div>                                      
                                     <div>                                    
-                                      <svg id={comment._id} onClick={(e)=>this.setState({
+                                      <svg id={comment.commentId} onClick={(e)=>this.setState({
                                             ...this.state,
                                             editMode:''
                                           })} style={{color:'red'}} focusable="false" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
@@ -340,7 +341,7 @@ class Blog extends Component {
                                   <div className="d-flex flex-row justify-content-between">
                                     <div className="d-flex">
                                       <div className="pr-5">
-                                        <img className="commentAvatar" src ={`https://i.pravatar.cc/150?u=${comment._id}`} alt="avatar"/>
+                                        <img className="commentAvatar" src ={comment.author.avatar} alt="avatar"/>
                                       </div>
                                       <div>
                                        <Form.Group>
@@ -361,7 +362,7 @@ class Blog extends Component {
                                       </div>
                                     </div>
                                     <div className="">
-                                        <svg id={comment._id} onClick={(e)=>this.editComment(e)} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-save" viewBox="0 0 16 16">
+                                        <svg id={comment.commentId} onClick={(e)=>this.editComment(e)} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-save" viewBox="0 0 16 16">
                                           <path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H9.5a1 1 0 0 0-1 1v7.293l2.646-2.647a.5.5 0 0 1 .708.708l-3.5 3.5a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L7.5 9.293V2a2 2 0 0 1 2-2H14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h2.5a.5.5 0 0 1 0 1H2z"/>
                                         </svg>
                                     </div>
@@ -373,10 +374,10 @@ class Blog extends Component {
                                   <Card.Header>
                                     <div className="d-flex justify-content-between">
                                       <div>
-                                        <h5>By: {comment.name}</h5>
+                                        <h5>By: {comment.author.name}{comment.author.surname}</h5>
                                       </div>                                      
                                       <div>
-                                        <svg id={comment._id} onClick={(e)=>this.deleteComment(e)} style={{color:'red'}} focusable="false" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+                                        <svg id={comment.commentId} onClick={(e)=>this.deleteComment(e)} style={{color:'red'}} focusable="false" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
                                       </div>
                                     </div>                                   
                                   </Card.Header>
@@ -384,14 +385,14 @@ class Blog extends Component {
                                     <div className="d-flex flex-row justify-content-between">
                                       <div className="d-flex">
                                         <div className="pr-5">
-                                          <img className="commentAvatar" src ={`https://i.pravatar.cc/150?u=${comment._id}`} alt="avatar"/>
+                                          <img className="commentAvatar" src ={comment.author.avatar} alt="avatar"/>
                                         </div>
                                         <div>
-                                          <Card.Text>{comment.comment}</Card.Text>
+                                          <Card.Text>{comment.text}</Card.Text>
                                         </div>
                                       </div>
                                       <div className="">                                      
-                                          <svg id={comment._id} onClick={(e)=>this.setState({
+                                          <svg id={comment.commentId} onClick={(e)=>this.setState({
                                             ...this.state,
                                             editMode:e.currentTarget.id,
                                             editComments:{
